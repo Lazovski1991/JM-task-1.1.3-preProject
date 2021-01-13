@@ -17,14 +17,14 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        String SQL = "CREATE TABLE IF NOT EXISTS users " +
+        String sql = "CREATE TABLE IF NOT EXISTS users " +
                 "(id INTEGER not NULL AUTO_INCREMENT, " +
                 " name VARCHAR(50) not NULL, " +
                 " last_name VARCHAR (50) not NULL, " +
                 " age INTEGER not NULL, " +
                 " PRIMARY KEY (id));";
         try {
-            PreparedStatement psSt = Util.getConnection().prepareStatement(SQL);
+            PreparedStatement psSt = Util.getConnection().prepareStatement(sql);
             psSt.executeUpdate();
         } catch (SQLException throwables) {
             throwables.printStackTrace();

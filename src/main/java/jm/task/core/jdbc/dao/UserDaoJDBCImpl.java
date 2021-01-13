@@ -9,6 +9,8 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
     private final String dbTable = "users";
+    private Connection connection = null;
+    private Savepoint savepoint = null;
 
     public UserDaoJDBCImpl() {
 
@@ -21,8 +23,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 " last_name VARCHAR (50) not NULL, " +
                 " age INTEGER not NULL, " +
                 " PRIMARY KEY (id));";
-        Connection connection = Util.getConnection();
-        Savepoint savepoint = null;
+        connection = Util.getConnection();
         try {
             savepoint = connection.setSavepoint("Save");
             PreparedStatement psSt = connection.prepareStatement(SQL);
@@ -40,8 +41,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void dropUsersTable() {
         String SQL = "DROP TABLE IF EXISTS users;";
-        Connection connection = Util.getConnection();
-        Savepoint savepoint = null;
+        connection = Util.getConnection();
         try {
             savepoint = connection.setSavepoint("Save");
             PreparedStatement psSt = connection.prepareStatement(SQL);
@@ -59,8 +59,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         String insert = "INSERT INTO " + dbTable + " (name, last_name, age) VALUES (?,?,?)";
-        Connection connection = Util.getConnection();
-        Savepoint savepoint = null;
+        connection = Util.getConnection();
         try {
             savepoint = connection.setSavepoint("Save");
             PreparedStatement prST = connection.prepareStatement(insert);
@@ -83,8 +82,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         String SQL = "DELETE FROM users WHERE id = " + id;
-        Connection connection = Util.getConnection();
-        Savepoint savepoint = null;
+        connection = Util.getConnection();
         try {
             savepoint = connection.setSavepoint("Save");
             PreparedStatement psSt = connection.prepareStatement(SQL);
@@ -103,10 +101,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> usersList = new ArrayList<>();
         String s = "SELECT * FROM " + dbTable;
-        Connection connection = Util.getConnection();
-        Savepoint savepoint = null;
+        connection = Util.getConnection();
         try {
-            savepoint = connection.setSavepoint("Save");
             PreparedStatement psSt = connection.prepareStatement(s);
             ResultSet resultSet = psSt.executeQuery();
             while (resultSet.next()) {
@@ -117,13 +113,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setAge((byte) resultSet.getInt(4));
                 usersList.add(user);
             }
-            connection.commit();
         } catch (SQLException throwables) {
-            try {
-                connection.rollback(savepoint);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
             throwables.printStackTrace();
         }
         return usersList;
@@ -131,8 +121,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void cleanUsersTable() {
         String SQL = "DELETE FROM users";
-        Connection connection = Util.getConnection();
-        Savepoint savepoint = null;
+        connection = Util.getConnection();
         try {
             savepoint = connection.setSavepoint();
             PreparedStatement psSt = connection.prepareStatement(SQL);

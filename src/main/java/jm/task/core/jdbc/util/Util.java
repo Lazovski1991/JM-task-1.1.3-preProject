@@ -17,6 +17,7 @@ public class Util {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(coonectionString, user, pass);
+            connection.setAutoCommit(false);
         } catch (SQLException ex) {
             System.out.println("Failed to establish a connection to the database!!!");
         }

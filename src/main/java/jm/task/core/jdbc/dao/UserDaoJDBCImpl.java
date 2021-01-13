@@ -3,6 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private String dbTable = "users";
+    private final String dbTable = "users";
 
     public UserDaoJDBCImpl() {
 
@@ -24,8 +25,11 @@ public class UserDaoJDBCImpl implements UserDao {
                 " age INTEGER not NULL, " +
                 " PRIMARY KEY (id));";
         try {
-            PreparedStatement psSt = Util.getConnection().prepareStatement(SQL);
+            Connection connection = Util.getConnection();
+            PreparedStatement psSt = connection.prepareStatement(SQL);
             psSt.executeUpdate();
+            connection.commit();
+
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -34,8 +38,10 @@ public class UserDaoJDBCImpl implements UserDao {
     public void dropUsersTable() {
         String SQL = "DROP TABLE IF EXISTS users;";
         try {
-            PreparedStatement psSt = Util.getConnection().prepareStatement(SQL);
+            Connection connection = Util.getConnection();
+            PreparedStatement psSt = connection.prepareStatement(SQL);
             psSt.executeUpdate();
+            connection.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -45,12 +51,14 @@ public class UserDaoJDBCImpl implements UserDao {
         String insert = "INSERT INTO " + dbTable + " (name, last_name, age) VALUES (?,?,?)";
 
         try {
-            PreparedStatement prST = Util.getConnection().prepareStatement(insert);
+            Connection connection = Util.getConnection();
+            PreparedStatement prST = connection.prepareStatement(insert);
             prST.setString(1, name);
             prST.setString(2, lastName);
             prST.setString(3, String.valueOf(age));
             prST.addBatch();
             prST.executeUpdate();
+            connection.commit();
             System.out.println("User с именем " + name + " добавлен в базу данных");
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -60,8 +68,10 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
         String SQL = "DELETE FROM users WHERE id = " + id;
         try {
-            PreparedStatement psSt = Util.getConnection().prepareStatement(SQL);
+            Connection connection = Util.getConnection();
+            PreparedStatement psSt = connection.prepareStatement(SQL);
             psSt.executeUpdate();
+            connection.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -71,7 +81,8 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> usersList = new ArrayList<>();
         String s = "SELECT * FROM " + dbTable;
         try {
-            PreparedStatement psSt = Util.getConnection().prepareStatement(s);
+            Connection connection = Util.getConnection();
+            PreparedStatement psSt = connection.prepareStatement(s);
             ResultSet resultSet = psSt.executeQuery();
             while (resultSet.next()) {
                 User user = new User();
@@ -81,6 +92,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setAge((byte) resultSet.getInt(4));
                 usersList.add(user);
             }
+            connection.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -90,8 +102,10 @@ public class UserDaoJDBCImpl implements UserDao {
     public void cleanUsersTable() {
         String SQL = "DELETE FROM users";
         try {
-            PreparedStatement psSt = Util.getConnection().prepareStatement(SQL);
+            Connection connection = Util.getConnection();
+            PreparedStatement psSt = connection.prepareStatement(SQL);
             psSt.executeUpdate();
+            connection.commit();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
